@@ -1,0 +1,31 @@
+{
+    "editor.fontSize": 14,
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": false,
+    "editor.wordWrap": "off",
+    "editor.minimap.enabled": true,
+    "editor.renderWhitespace": "selection",
+    "editor.bracketPairColorization.enabled": true,
+    "workbench.colorTheme": "Default Dark+",
+    "workbench.iconTheme": "vs-seti",
+    "workbench.sideBar.location": "left",
+    "workbench.statusBar.visible": true,
+    "workbench.activityBar.location": "default",
+    "explorer.compactFolders": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/cpu_sim": true,
+        "**/cpu_sim_arm": true,
+        "**/*.bin": true,
+        "**/*.o": true
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.default.includePath": [
+        "${workspaceFolder}/**"
+    ],
+    "terminal.integrated.defaultProfile.linux": "bash"
+}

@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug CPU Simulator (Native)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/01_SingleThreaded_CPU/Implementation/cpu_sim",
+            "args": [
+                "${workspaceFolder}/01_SingleThreaded_CPU/Implementation/programs/test_fibonacci.bin",
+                "--trace",
+                "--dump-mem",
+                "0x00080000",
+                "40"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/01_SingleThreaded_CPU/Implementation",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build Native",
+            "miDebuggerPath": "/usr/bin/gdb"
+        }
+    ]
+}
