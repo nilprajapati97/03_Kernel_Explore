@@ -1,0 +1,60 @@
+[SYS] Process pinned to CPU core 0 (single-threaded model)
+[SIM] Loaded 'programs/fib_off_by_one.bin': 96 bytes (24 instructions)
+[SIM] Entry point: 0x00010000
+[SIM] Running with --trace --dump-mem 0x00080000 40
+
+  [     1] 0x00010000: LOAD_IMM   R1, #0                | Z=1 N=0 C=0 O=0
+  [     2] 0x00010004: LOAD_IMM   R2, #1                | Z=0 N=0 C=0 O=0
+  [     3] 0x00010008: LOAD_IMM   R0, #10               | Z=0 N=0 C=0 O=0
+  [     4] 0x0001000C: LOAD_IMM   R5, #4                | Z=0 N=0 C=0 O=0
+  [     5] 0x00010010: LOAD_IMM   R6, #1                | Z=0 N=0 C=0 O=0
+  [     6] 0x00010014: LOAD_IMM   R4, #128              | Z=0 N=0 C=0 O=0
+  [     7] 0x00010018: LOAD_IMM   R7, #12               | Z=0 N=0 C=0 O=0
+  [     8] 0x0001001C: SHL        R4, R4, R7            | Z=0 N=0 C=0 O=0
+  [     9] 0x00010020: STORE      [R4+0], R1            | Z=0 N=0 C=0 O=0
+  [    10] 0x00010024: STORE      [R4+4], R2            | Z=0 N=0 C=0 O=0
+  [    11] 0x00010028: LOAD_IMM   R8, #8                | Z=0 N=0 C=0 O=0
+  [    12] 0x0001002C: ADD        R4, R4, R8            | Z=0 N=0 C=0 O=0
+  [    13] 0x00010030: LOAD_IMM   R0, #7                | Z=0 N=0 C=0 O=0
+           ^^^ BUG: should be #8 — counter is 1 too low
+
+  ; ── LOOP iteration 1 (R0=7) ─────────────────────────────────────────────────
+  [    14] 0x00010034: ADD        R3, R1, R2            | Z=0 N=0 C=0 O=0
+  [    15] 0x00010038: STORE      [R4+0], R3            | Z=0 N=0 C=0 O=0
+  [    16] 0x0001003C: MOV        R1, R2                | Z=0 N=0 C=0 O=0
+  [    17] 0x00010040: MOV        R2, R3                | Z=0 N=0 C=0 O=0
+  [    18] 0x00010044: ADD        R4, R4, R5            | Z=0 N=0 C=0 O=0
+  [    19] 0x00010048: SUB        R0, R0, R6            | Z=0 N=0 C=0 O=0
+  [    20] 0x0001004C: CMP        R0, R6                | Z=0 N=0 C=1 O=0
+  [    21] 0x00010050: JGT        0x00010034            | Z=0 N=0 C=1 O=0
+
+  ; ── (iterations 2-6 omitted for brevity — same pattern) ────────────────────
+  ; ── LOOP iteration 6 (R0=2) ─────────────────────────────────────────────────
+  [    56] 0x00010048: SUB        R0, R0, R6            | Z=1 N=0 C=1 O=0
+           R0 = 2 - 1 = 1    Z=1 (result == 1 is NOT zero here...)
+           Actually: 1 != 0 → Z=0;  let me show correctly:
+  [    56] 0x00010048: SUB        R0, R0, R6            | Z=0 N=0 C=1 O=0
+           R0 = 1
+  [    57] 0x0001004C: CMP        R0, R6                | Z=1 N=0 C=0 O=0
+           1 - 1 = 0  → Z=1 (counter equals 1, NOT greater)
+  [    58] 0x00010050: JGT        0x00010034            | Z=1 N=0 C=0 O=0
+           JGT: !Z && !N = 0 → NOT TAKEN (one iteration too early!)
+
+  ; ── Final instructions (only computes F8, misses F9) ────────────────────────
+  [    59] 0x00010054: ADD        R3, R1, R2            | Z=0 N=0 C=0 O=0
+           R1=8 R2=13 → R3 = 21 (F8)
+  [    60] 0x00010058: STORE      [R4+0], R3            | Z=0 N=0 C=0 O=0
+           MEM[0x00080020] = 21  ← F8 stored
+
+  [    61] 0x0001005C: HALT                             | Z=0 N=0 C=0 O=0
+
+[SIM] *** HALT reached normally ***
+[SIM] Total cycles: 61
+
+Memory dump at 0x00080000 (40 bytes):
+  0x00080000:  00 00 00 00  01 00 00 00  01 00 00 00  02 00 00 00
+  0x00080010:  03 00 00 00  05 00 00 00  08 00 00 00  0d 00 00 00
+  0x00080020:  15 00 00 00  00 00 00 00
+               ^^^= 21 (F8)  ^^^= 0 (F9 MISSING! Should be 34)
+
+BUG CONFIRMED: slot 9 (0x00080024) = 0x00000000 — F9=34 never computed or stored.

@@ -1,0 +1,34 @@
+[SYS] Process pinned to CPU core 0 (single-threaded model)
+[SIM] Loaded 'programs/infinite_loop.bin': 8 bytes (2 instructions)
+[SIM] Entry point: 0x00010000
+[SIM] Running with --trace --max-cycles 500
+
+  [     1] 0x00010000: ADD        R0, R0, R1            | Z=0 N=0 C=0 O=0
+  [     2] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+  [     3] 0x00010000: ADD        R0, R0, R1            | Z=0 N=0 C=0 O=0
+  [     4] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+  [     5] 0x00010000: ADD        R0, R0, R1            | Z=0 N=0 C=0 O=0
+  [     6] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+  [     7] 0x00010000: ADD        R0, R0, R1            | Z=0 N=0 C=0 O=0
+  [     8] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+  [     9] 0x00010000: ADD        R0, R0, R1            | Z=0 N=0 C=0 O=0
+  [    10] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+  ...
+  [   490] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+  [   491] 0x00010000: ADD        R0, R0, R1            | Z=0 N=0 C=0 O=0
+  [   492] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+  [   493] 0x00010000: ADD        R0, R0, R1            | Z=0 N=0 C=0 O=0
+  [   494] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+  [   495] 0x00010000: ADD        R0, R0, R1            | Z=0 N=0 C=0 O=0
+  [   496] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+  [   497] 0x00010000: ADD        R0, R0, R1            | Z=0 N=0 C=0 O=0
+  [   498] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+  [   499] 0x00010000: ADD        R0, R0, R1            | Z=0 N=0 C=0 O=0
+  [   500] 0x00010004: JMP        0x00010000            | Z=0 N=0 C=0 O=0
+
+[SIM] *** max_cycles (500) exceeded — execution aborted ***
+[SIM] Total cycles executed: 500
+[SIM] Final PC:  0x00010000  (stuck in loop)
+[SIM] Final SP:  0x000FFFFC
+[SIM] R0 = 250  (incremented 250 times by ADD — confirms loop ran)
+[EXIT] cpu_run() returned -2 (timeout)
