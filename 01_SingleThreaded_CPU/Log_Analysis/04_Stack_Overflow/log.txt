@@ -1,0 +1,35 @@
+[SYS] Process pinned to CPU core 0 (single-threaded model)
+[SIM] Loaded 'programs/stack_overflow.bin': 12 bytes (3 instructions)
+[SIM] Entry point: 0x00010000
+[SIM] Stack top:   0x000FFFFC
+[SIM] Running with --trace --max-cycles 20000
+
+  [     1] 0x00010000: LOAD_IMM   R1, #0xAA             | Z=0 N=0 C=0 O=0
+  [     2] 0x00010004: PUSH       R1                    | Z=0 N=0 C=0 O=0
+           SP: 0x000FFFFC → 0x000FFFF8  MEM[0x000FFFF8] = 0xAA
+  [     3] 0x00010008: JMP        0x00010004            | Z=0 N=0 C=0 O=0
+  [     4] 0x00010004: PUSH       R1                    | Z=0 N=0 C=0 O=0
+           SP: 0x000FFFF8 → 0x000FFFF4  MEM[0x000FFFF4] = 0xAA
+  [     5] 0x00010008: JMP        0x00010004            | Z=0 N=0 C=0 O=0
+  [     6] 0x00010004: PUSH       R1                    | Z=0 N=0 C=0 O=0
+           SP: 0x000FFFF4 → 0x000FFFF0  MEM[0x000FFFF0] = 0xAA
+  ...
+  [  9999] 0x00010004: PUSH       R1                    | Z=0 N=0 C=0 O=0
+           SP: 0x000D8004 → 0x000D8000  MEM[0x000D8000] = 0xAA
+  [ 10000] 0x00010008: JMP        0x00010004            | Z=0 N=0 C=0 O=0
+
+  [Notice] SP has crossed 0x000F0000 boundary at cycle 8194 →
+           stack is now overwriting the DATA SEGMENT (0x00080000–0x000EFFFF)
+
+  [ 16384] 0x00010004: PUSH       R1                    | Z=0 N=0 C=0 O=0
+           SP: 0x00080004 → 0x00080000  MEM[0x00080000] = 0xAA
+           ^^^ DATA SEGMENT START — all Fibonacci results now overwritten!
+  [ 16385] 0x00010008: JMP        0x00010004            | Z=0 N=0 C=0 O=0
+  ...
+  [ 20000] 0x00010008: JMP        0x00010004            | Z=0 N=0 C=0 O=0
+
+[SIM] *** max_cycles (20000) exceeded — execution aborted ***
+[SIM] Total cycles: 20000
+[SIM] Final SP: 0x00057AEC  (deep inside CODE segment — 0x00010000–0x0007FFFF)
+[SIM] Stack overflowed: crossed DATA at cycle ~8194, CODE at cycle ~16384+
+[EXIT] cpu_run() returned -2 (timeout)

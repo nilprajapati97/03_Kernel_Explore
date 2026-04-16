@@ -1,0 +1,25 @@
+[SYS] Process pinned to CPU core 0 (single-threaded model)
+[SIM] Loaded 'programs/div_by_zero.bin': 20 bytes (5 instructions)
+[SIM] Entry point: 0x00010000
+[SIM] Running with --trace --dump-mem 0x00080000 4
+
+  [     1] 0x00010000: LOAD_IMM   R4, #128              | Z=0 N=0 C=0 O=0
+  [     2] 0x00010004: LOAD_IMM   R7, #12               | Z=0 N=0 C=0 O=0
+  [     3] 0x00010008: SHL        R4, R4, R7            | Z=0 N=0 C=0 O=0
+  [     4] 0x0001000C: LOAD_IMM   R1, #42               | Z=0 N=0 C=0 O=0
+  [     5] 0x00010010: LOAD_IMM   R2, #0                | Z=1 N=0 C=0 O=0
+  [     6] 0x00010014: DIV        R3, R1, R2            | Z=1 N=0 C=0 O=0
+
+[WARN] DIV by zero at cycle 6 addr 0x00010014 — R2=0, result forced to 0
+
+  [     7] 0x00010018: STORE      [R4+0], R3            | Z=1 N=0 C=0 O=0
+  [     8] 0x0001001C: HALT                             | Z=1 N=0 C=0 O=0
+
+[SIM] *** HALT reached normally ***
+[SIM] Total cycles executed: 8
+[SIM] Final R3 = 0x00000000  (should have been 42 — corrupted by div-by-zero)
+
+Memory dump at 0x00080000 (4 bytes):
+  0x00080000:  00 00 00 00
+
+[NOTE] Result 0 is WRONG. Expected 42. Division by zero produced silent data corruption.

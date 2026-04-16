@@ -1,0 +1,29 @@
+[SYS] Process pinned to CPU core 0 (single-threaded model)
+[SIM] Loaded 'programs/oob_access.bin': 32 bytes (8 instructions)
+[SIM] Entry point: 0x00010000
+[SIM] Running with --trace
+
+  [     1] 0x00010000: LOAD_IMM   R4, #0x7FF            | Z=0 N=0 C=0 O=0
+  [     2] 0x00010004: LOAD_IMM   R7, #12               | Z=0 N=0 C=0 O=0
+  [     3] 0x00010008: SHL        R4, R4, R7            | Z=0 N=0 C=0 O=0
+           R4 = 0x7FF000
+  [     4] 0x0001000C: LOAD_IMM   R5, #0x7FF            | Z=0 N=0 C=0 O=0
+  [     5] 0x00010010: SHL        R5, R5, R7            | Z=0 N=0 C=0 O=0
+           R5 = 0x7FF000
+  [     6] 0x00010014: ADD        R4, R4, R5            | Z=0 N=0 C=0 O=0
+           R4 = 0xFFE000
+  [     7] 0x00010018: LOAD_IMM   R6, #0x400            | Z=0 N=0 C=0 O=0
+  [     8] 0x0001001C: ADD        R4, R4, R6            | Z=0 N=0 C=0 O=0
+           R4 = 0x00100400  ← EXCEEDS MEM_SIZE (0x00100000)
+  [     9] 0x00010020: LOAD       R0, [R4+0]            | Z=0 N=0 C=0 O=0
+
+[ERR] mem_read32: address 0x00100400 is out of bounds (max 0x000FFFFF)
+[ERR] CPU state → FAULT
+
+[SIM] *** FAULT — memory out-of-bounds read ***
+[SIM] Faulting instruction: LOAD R0, [R4+0]  at 0x00010020
+[SIM] Faulting address:     0x00100400
+[SIM] Valid range:          0x00000000 – 0x000FFFFF
+[SIM] Total cycles executed: 9
+[SIM] R0 = 0   (no data read — fault before write-back)
+[EXIT] cpu_run() returned -1 (fault)

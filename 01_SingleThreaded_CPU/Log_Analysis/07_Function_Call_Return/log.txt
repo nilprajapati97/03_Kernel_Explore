@@ -1,0 +1,65 @@
+[SYS] Process pinned to CPU core 0 (single-threaded model)
+[SIM] Loaded 'programs/call_return.bin': 44 bytes (11 instructions)
+[SIM] Entry point: 0x00010000
+[SIM] Stack top:   0x000FFFFC
+[SIM] Running with --trace --dump-mem 0x00080000 8
+
+  ; ── Setup base address ──────────────────────────────────────────────────────
+  [     1] 0x00010000: LOAD_IMM   R4, #128              | Z=0 N=0 C=0 O=0
+  [     2] 0x00010004: LOAD_IMM   R7, #12               | Z=0 N=0 C=0 O=0
+  [     3] 0x00010008: SHL        R4, R4, R7            | Z=0 N=0 C=0 O=0
+           R4 = 0x00080000
+
+  ; ── First call: multiply 5 by 3 ─────────────────────────────────────────────
+  [     4] 0x0001000C: LOAD_IMM   R0, #5                | Z=0 N=0 C=0 O=0
+  [     5] 0x00010010: CALL       0x00010024            | Z=0 N=0 C=0 O=0
+           LR (R14) = 0x00010014  (return address = next instruction)
+           PC = 0x00010024        (subroutine entry)
+
+  ; ── Inside MULTIPLY_BY_3 (first call) ───────────────────────────────────────
+  [     6] 0x00010024: PUSH       R14                   | Z=0 N=0 C=0 O=0
+           SP: 0x000FFFFC → 0x000FFFF8  MEM[0x000FFFF8] = 0x00010014
+  [     7] 0x00010028: LOAD_IMM   R1, #3                | Z=0 N=0 C=0 O=0
+  [     8] 0x0001002C: MUL        R0, R0, R1            | Z=0 N=0 C=0 O=0
+           R0 = 5 × 3 = 15
+  [     9] 0x00010030: POP        R14                   | Z=0 N=0 C=0 O=0
+           R14 (LR) = MEM[0x000FFFF8] = 0x00010014
+           SP: 0x000FFFF8 → 0x000FFFFC
+  [    10] 0x00010034: RET                              | Z=0 N=0 C=0 O=0
+           PC = LR = 0x00010014  ← return to caller
+
+  ; ── Back in main ────────────────────────────────────────────────────────────
+  [    11] 0x00010014: STORE      [R4+0], R0            | Z=0 N=0 C=0 O=0
+           MEM[0x00080000] = 15
+
+  ; ── Second call: multiply 7 by 3 ────────────────────────────────────────────
+  [    12] 0x00010018: LOAD_IMM   R0, #7                | Z=0 N=0 C=0 O=0
+  [    13] 0x0001001C: CALL       0x00010024            | Z=0 N=0 C=0 O=0
+           LR (R14) = 0x00010020
+           PC = 0x00010024
+
+  ; ── Inside MULTIPLY_BY_3 (second call) ──────────────────────────────────────
+  [    14] 0x00010024: PUSH       R14                   | Z=0 N=0 C=0 O=0
+           SP: 0x000FFFFC → 0x000FFFF8  MEM[0x000FFFF8] = 0x00010020
+  [    15] 0x00010028: LOAD_IMM   R1, #3                | Z=0 N=0 C=0 O=0
+  [    16] 0x0001002C: MUL        R0, R0, R1            | Z=0 N=0 C=0 O=0
+           R0 = 7 × 3 = 21
+  [    17] 0x00010030: POP        R14                   | Z=0 N=0 C=0 O=0
+           R14 (LR) = 0x00010020
+           SP: 0x000FFFF8 → 0x000FFFFC
+  [    18] 0x00010034: RET                              | Z=0 N=0 C=0 O=0
+           PC = LR = 0x00010020
+
+  ; ── Back in main ────────────────────────────────────────────────────────────
+  [    19] 0x00010020: STORE      [R4+4], R0            | Z=0 N=0 C=0 O=0
+           MEM[0x00080004] = 21
+  [    20] 0x00010024: HALT                             | Z=0 N=0 C=0 O=0
+
+[SIM] *** HALT reached normally ***
+[SIM] Total cycles: 20
+[SIM] Final SP: 0x000FFFFC  (stack balanced — both PUSH/POP pairs matched)
+[SIM] Final LR: 0x00010020
+
+Memory dump at 0x00080000 (8 bytes):
+  0x00080000:  0f 00 00 00  15 00 00 00
+               ^^^= 15      ^^^= 21

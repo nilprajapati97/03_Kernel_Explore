@@ -1,0 +1,47 @@
+[SYS] Process pinned to CPU core 0 (single-threaded model)
+[SIM] Loaded 'programs/flag_dependency.bin': 32 bytes (8 instructions)
+[SIM] Entry point: 0x00010000
+[SIM] Running with --trace
+
+  [     1] 0x00010000: LOAD_IMM   R0, #5                | Z=0 N=0 C=0 O=0
+  [     2] 0x00010004: LOAD_IMM   R1, #5                | Z=0 N=0 C=0 O=0
+
+  [     3] 0x00010008: CMP        R0, R1                | Z=1 N=0 C=0 O=0
+           5 - 5 = 0 → Z=1 (equal!)
+           Programmer INTENDS to branch on this flag next.
+
+  ; ── Intervening instructions disturb the flags ──────────────────────────────
+  [     4] 0x0001000C: LOAD_IMM   R4, #128              | Z=0 N=0 C=0 O=0
+           ^^^ LOAD_IMM does NOT set Z from the result's magnitude...
+           Actually on this CPU LOAD_IMM does NOT update flags, so Z still =1
+           But the next SHL DOES update flags:
+
+  [     5] 0x00010010: LOAD_IMM   R7, #12               | Z=0 N=0 C=0 O=0
+           LOAD_IMM: flags NOT updated → Z still =1 from CMP
+
+  [     6] 0x00010014: SHL        R4, R4, R7            | Z=0 N=0 C=0 O=0
+           0x80 << 12 = 0x00080000 ≠ 0  → Z=0   ← FLAGS OVERWRITTEN!
+           N=0 (bit 31 not set), C=0, O=0
+
+  ; ── Branch uses WRONG flags (from SHL, not from CMP) ───────────────────────
+  [     7] 0x00010018: JEQ        0x00010024            | Z=0 N=0 C=0 O=0
+           JEQ checks Z==1. Z is now 0 (from SHL, not CMP).
+           Branch NOT taken — falls through to wrong path!
+
+  ; ── Wrong path ──────────────────────────────────────────────────────────────
+  [     8] 0x0001001C: ADD        R2, R0, R1            | Z=0 N=0 C=0 O=0
+           R2 = 5 + 5 = 10  (WRONG outcome — R2 should be 99)
+  [     9] 0x00010020: HALT                             | Z=0 N=0 C=0 O=0
+
+[SIM] *** HALT reached normally ***
+
+  ; (EQUAL_BRANCH at 0x00010024 was never reached)
+  ; [    ?] 0x00010024: LOAD_IMM R2, #99  ← intended outcome, never executed
+
+[SIM] Total cycles: 9
+[SIM] R2 = 10  (WRONG — expected 99)
+[SIM] Root cause: Z flag set to 1 by CMP at cycle 3 was overwritten
+                  by SHL at cycle 6 before the JEQ at cycle 7 was tested.
+
+[NOTE] This is a FLAG HAZARD — not a crash, not a hardware fault, just
+       silently wrong program logic due to flag clobbering.

@@ -1,0 +1,19 @@
+[SYS] Process pinned to CPU core 0 (single-threaded model)
+[SIM] Loaded 'programs/illegal_opcode.bin': 16 bytes (4 instructions)
+[SIM] Entry point: 0x00010000
+[SIM] Running with --trace
+
+  [     1] 0x00010000: LOAD_IMM   R1, #10               | Z=0 N=0 C=0 O=0
+
+  [     2] 0x00010004: ???        [raw=0xDE000000]      | Z=0 N=0 C=0 O=0
+
+[ERR] Illegal opcode 0xDE at cycle 2, addr 0x00010004 (raw=0xDE000000)
+[ERR] CPU state → FAULT
+
+[SIM] *** FAULT — illegal opcode ***
+[SIM] Total cycles executed: 2
+[SIM] Final PC:  0x00010008  (PC advanced past faulting instruction before detection)
+[SIM] Final SP:  0x000FFFFC
+[SIM] R1 = 10  (correctly set before fault)
+[SIM] R2 = 0   (ADD never executed)
+[EXIT] cpu_run() returned -1 (fault)
