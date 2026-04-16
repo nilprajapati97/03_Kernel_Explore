@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug CPU Simulator",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/01_SingleThreaded_CPU/Implementation/cpu_sim",
+            "args": [
+                "${workspaceFolder}/01_SingleThreaded_CPU/Implementation/programs/test_fibonacci.bin",
+                "--trace",
+                "--dump-mem", "0x00080000", "40"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/01_SingleThreaded_CPU/Implementation",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "preLaunchTask": "Build Native"
+        }
+    ]
+}

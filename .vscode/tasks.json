@@ -1,0 +1,62 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Native",
+            "type": "shell",
+            "command": "make",
+            "args": ["native"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/01_SingleThreaded_CPU/Implementation"
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build ARM",
+            "type": "shell",
+            "command": "make",
+            "args": ["arm"],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/01_SingleThreaded_CPU/Implementation"
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Assemble",
+            "type": "shell",
+            "command": "make",
+            "args": ["assemble"],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/01_SingleThreaded_CPU/Implementation"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run Native",
+            "type": "shell",
+            "command": "make",
+            "args": ["run"],
+            "group": "test",
+            "options": {
+                "cwd": "${workspaceFolder}/01_SingleThreaded_CPU/Implementation"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "make",
+            "args": ["clean"],
+            "options": {
+                "cwd": "${workspaceFolder}/01_SingleThreaded_CPU/Implementation"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
