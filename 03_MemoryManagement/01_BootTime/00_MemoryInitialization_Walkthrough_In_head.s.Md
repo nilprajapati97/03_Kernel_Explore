@@ -1,24 +1,5 @@
 Let me trace the memory initialization path through `head.S` and its key callees.  
 
-Searched for regex `__pi_early_map_kernel|__pi_create_init_idmap|__cpu_setup|init_idmap_pg_dir|reserved_pg_dir|swapper_pg_dir` (`linux` · `arch/arm64/**`), 20 results
-
-Searched for regex `SYM_FUNC_START(__cpu_setup)` (`linux` · `arch/arm64/**`), 1 result
-
-Searched for text `__pi_early_map_kernel` (`linux` · `arch/arm64/**`), 1 result
-
-Read [](file:///home/nilprajapti/Workspace/Kernel_SourceCode/linux/arch/arm64/mm/proc.S#475-475), lines 475 to 570
-
-Searched for regex `SYM_FUNC_START(early_map_kernel)|SYM_FUNC_START(__early_map_kernel)` (`linux` · `arch/arm64/**`), no results
-
-Searched for regex `SYM_FUNC_START(create_init_idmap)|__pi_create_init_idmap` (`linux` · `arch/arm64/**`), 1 result
-
-Searched for regex `early_map_kernel|create_init_idmap` (`linux` · `arch/arm64/**`), 11 results
-
-Read [](file:///home/nilprajapti/Workspace/Kernel_SourceCode/linux/arch/arm64/kernel/pi/map_kernel.c#1-1), lines 1 to 260
-
-Read [](file:///home/nilprajapti/Workspace/Kernel_SourceCode/linux/arch/arm64/kernel/pi/map_range.c#85-85), lines 85 to 110
-
-Here is the full memory initialization walkthrough for ARM64, from the very first instruction through MMU-on:
 
 ---
 
