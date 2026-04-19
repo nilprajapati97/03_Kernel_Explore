@@ -1,9 +1,13 @@
 # `primary_entry()` — Kernel Entry Point
 
 **Source:** `arch/arm64/kernel/head.S` lines 82–124
+
 **Phase:** Assembly Boot (MMU OFF)
+
 **Memory Allocator:** None
+
 **Called by:** Bootloader (direct jump)
+
 **Calls:** `record_mmu_state()`, `preserve_boot_args()`, `__pi_create_init_idmap()`, `init_kernel_el()`, `__cpu_setup()`, `__primary_switch()`
 
 ---
