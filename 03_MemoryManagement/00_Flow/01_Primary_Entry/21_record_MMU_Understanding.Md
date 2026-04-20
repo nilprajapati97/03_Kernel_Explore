@@ -92,3 +92,38 @@ Key points:
 The function answers two questions for the boot path:
 1. **Was the MMU+cache on at entry?** → stored in `x19` (nonzero = yes)
 2. **Is the CPU endianness wrong?** → if so, fix it immediately by toggling `SCTLR.EE`, disable the MMU, and report MMU-off
+
+
+When a LE kernel finds `EE=1` (CPU is in big-endian mode), execution branches to label `1:` (line 154) and does the following:
+
+### Step-by-step at label `1:`
+
+```asm
+1:  eor   x19, x19, #SCTLR_ELx_EE   // (1) toggle EE: 1→0 (switch to LE)
+    bic   x19, x19, #SCTLR_ELx_M     // (2) clear M bit (force MMU off)
+    b.ne  2f                           // (3) if EL1, go to 2f
+    msr   sctlr_el2, x19              // (4a) EL2: write fixed SCTLR
+    b     3f
+2:  msr   sctlr_el1, x19              // (4b) EL1: write fixed SCTLR
+3:  isb                                // (5) synchronize pipeline
+    mov   x19, xzr                     // (6) report MMU-off
+    ret
+```
+
+### What each step accomplishes
+
+1. **`EOR` flips EE from 1→0**: This changes the CPU's data endianness from big-endian to little-endian, matching what the LE kernel expects. Without this, every memory load/store (including instruction fetches from the ID map) would interpret bytes in the wrong order.
+
+2. **`BIC` clears M (MMU off)**: The page tables were populated by the bootloader or EFI stub using the *old* byte order. If the MMU stayed on after flipping endianness, the translation table walker would read page table entries with reversed byte order → immediate translation fault / garbage mappings. So the MMU **must** be disabled first.
+
+3. **`B.NE` selects the correct EL register**: The condition flags still reflect the `cmp x19, #CurrentEL_EL2` from line 136. The modified SCTLR is written to whichever exception level the CPU is actually running at (`sctlr_el2` or `sctlr_el1`).
+
+4. **`MSR` writes the corrected SCTLR**: The hardware immediately begins using the new configuration after the next synchronization point.
+
+5. **`ISB` flushes the pipeline**: This is mandatory — the ARM architecture requires an ISB after writing SCTLR so that all subsequent instructions are fetched and decoded under the new endianness and MMU settings. Without it, the CPU could execute stale instructions fetched under BE ordering.
+
+6. **`x19 = 0`**: Since the MMU was just disabled, the function reports "MMU off" to the caller. This tells `primary_entry` to use **cache invalidation** (not clean) for the page tables it builds next, because with the MMU off, any cached data is stale/irrelevant.
+
+### Why this matters
+
+If the kernel *didn't* do this, every `ldr`/`str` instruction would swap bytes. For example, loading the 32-bit value `0x12345678` from memory would yield `0x78563412`. The kernel's compiled code, data structures, and page tables all assume LE byte order, so execution would crash almost immediately — likely on the very next memory access after `record_mmu_state` returns.
