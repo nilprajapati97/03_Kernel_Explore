@@ -333,4 +333,83 @@ They focus less on definitions and more on:
 
 ---
 
+For a candidate with 10 years of experience, a Linux Kernel interview shifts from "how do things work" to "why are they designed this way" and "how do they perform at scale." 
+
+Here are 50 system design and internal architecture questions categorized by subsystem.
+
+---
+
+## 1. Process Management & Scheduling
+1. **Explain the Completely Fair Scheduler (CFS) design.** *Answer:* CFS uses a Red-Black tree to manage runnable processes based on `vruntime`. It aims to give each process an equal share of the processor.
+2. **How does the kernel handle Load Balancing in multi-core systems?** *Answer:* It uses scheduling domains to represent the CPU hierarchy (SMT, Cores, Sockets) and pulls tasks from busier queues to idle ones.
+3. **What is the difference between `TASK_INTERRUPTIBLE` and `TASK_UNINTERRUPTIBLE`?** *Answer:* Both are sleeping states, but `UNINTERRUPTIBLE` ignores signals (used for critical I/O), preventing the process from being killed until the event occurs.
+4. **How does `copy-on-write` (COW) work during a `fork()`?** *Answer:* Pages aren't copied initially; the child shares the parent's pages marked as read-only. A copy is made only when one process attempts a write.
+5. **Describe the implementation of Namespaces for Containers.** *Answer:* Namespaces wrap global system resources (PID, Net, Mount) in an abstraction that makes processes within a namespace think they have their own isolated instance.
+6. **What is a "Zombie" process and why does it exist?** *Answer:* A process that has finished execution but still has an entry in the process table so the parent can read its exit code via `wait()`.
+7. **Explain the `preempt_count` variable.** *Answer:* An atomic counter used to track if the current context can be preempted (e.g., it’s 0 when in a safe user-space/kernel-thread state).
+8. **How does the Real-Time (`PREEMPT_RT`) patch change the kernel?** *Answer:* It turns spinlocks into sleepable mutexes and forces almost all interrupt handlers into threaded contexts to reduce latency.
+9. **Explain "Priority Inversion" and how the kernel solves it.** *Answer:* A low-priority task holds a resource needed by a high-priority task. Solved via Priority Inheritance (temporarily boosting the low-priority task).
+10. **What is the `sched_yield()` syscall and why is it often discouraged?** *Answer:* It gives up the CPU voluntarily, but in modern CFS, it might just put the process back at the end of the tree, leading to "ping-pong" overhead.
+
+---
+
+## 2. Memory Management
+11. **Explain the Buddy Allocator.** *Answer:* It splits memory into power-of-two sized blocks to minimize external fragmentation and allows quick merging of "buddy" blocks when freed.
+12. **What is the Slab Allocator (SLUB/SLAB)?** *Answer:* A cache of frequently used objects (like `task_struct`) to avoid the overhead of full allocation/deallocation and reduce internal fragmentation.
+13. **How does the OOM (Out of Memory) Killer choose a victim?** *Answer:* It calculates an `oom_score` based on memory usage, process importance, and `oom_score_adj` values.
+14. **Describe the difference between Physical and Virtual addresses.** *Answer:* Physical is the actual RAM location; Virtual is what the CPU sees, translated via the MMU and Page Tables.
+15. **What is a TLB (Translation Lookaside Buffer)?** *Answer:* A hardware cache in the CPU that stores recent virtual-to-physical address translations to speed up memory access.
+16. **How does "Memory Compaction" work?** *Answer:* The kernel moves used pages to one end of a memory zone to create larger contiguous free blocks for high-order allocations.
+17. **What is the role of `kswapd`?** *Answer:* A kernel thread that runs asynchronously to reclaim pages when free memory drops below a certain "low" watermark.
+18. **Explain "HugePages" and why they are used.** *Answer:* Using larger page sizes (e.g., 2MB vs 4KB) to reduce the number of TLB misses for memory-intensive applications like databases.
+19. **What is "Memory Overcommit"?** *Answer:* The kernel allowing processes to allocate more memory than physically available, betting that not all processes will use their full allocation at once.
+20. **Explain the "Dirty Ratio" in the Page Cache.** *Answer:* The percentage of system memory that can be filled with "dirty" (unwritten to disk) pages before the kernel starts forcing writes.
+
+---
+
+## 3. I/O and File Systems
+21. **What is the VFS (Virtual File System) layer?** *Answer:* An abstraction layer that allows different filesystems (ext4, XFS, NFS) to appear uniform to user-space via standard syscalls.
+22. **Explain the `inode` structure.** *Answer:* A data structure that stores metadata about a file (permissions, size, block locations) but not the filename or the actual data.
+23. **What is a "Dentry" (Directory Entry) cache?** *Answer:* A cache that links filenames to their corresponding inodes to speed up file path lookups.
+24. **How does "Asynchronous I/O" (AIO) differ from `io_uring`?** *Answer:* AIO is older and often blocks on O_DIRECT; `io_uring` is a modern, ring-buffer based interface that minimizes syscall overhead and context switching.
+25. **Explain the Page Cache.** *Answer:* A transparent cache of disk blocks in RAM, allowing the kernel to satisfy read requests without hitting the disk.
+26. **What is "Direct I/O" (O_DIRECT)?** *Answer:* Bypassing the Page Cache to let the application manage its own caching (common in high-performance databases).
+27. **Describe the "I/O Scheduler" (e.g., BFQ, Kyber).** *Answer:* It decides the order in which I/O requests are sent to the storage device to optimize throughput or minimize latency.
+28. **How do Hard Links and Soft Links differ at the kernel level?** *Answer:* Hard links point to the same inode; soft links are separate files containing a path string to another file.
+29. **What is the purpose of the `writeback` mechanism?** *Answer:* Periodically flushing "dirty" pages from RAM to disk to ensure data persistence while maintaining performance.
+30. **Explain the "Bio" structure in the Block I/O layer.** *Answer:* The primary unit of I/O in the kernel, representing an I/O operation in progress, containing target blocks and memory segments.
+
+---
+
+## 4. Interrupts & Synchronization
+31. **What are "Top Halves" and "Bottom Halves"?** *Answer:* Top half is the immediate ISR (Interrupt Service Routine) that runs with interrupts disabled; Bottom half (Tasklets, Workqueues) handles the heavy lifting later.
+32. **Explain the difference between Spinlocks and Mutexes.** *Answer:* Spinlocks busy-wait (consume CPU) and cannot sleep; Mutexes put the thread to sleep and are used for longer-held locks.
+33. **What is RCU (Read-Copy-Update)?** *Answer:* A synchronization mechanism that allows multiple readers to access data simultaneously with a single writer by creating a copy for updates.
+34. **Why shouldn't you sleep in an Interrupt Context?** *Answer:* Because the interrupt handler doesn't have a task context; there is no way for the scheduler to "wake up" an ISR.
+35. **What is an "Atomic Operation"?** *Answer:* An operation that completes in a single step without being interrupted, essential for managing counters in SMP systems.
+36. **Explain "Softirqs" vs "Tasklets".** *Answer:* Softirqs are statically allocated and can run on multiple CPUs simultaneously; Tasklets are built on softirqs but are dynamically allocated and pinned to one CPU.
+37. **What is "IRQ Affinity"?** *Answer:* The ability to bind specific hardware interrupts to specific CPU cores to improve cache locality and performance.
+38. **Describe "Sequence Locks" (seqlocks).** *Answer:* Optimized for frequent reads and infrequent writes; readers check a sequence counter to see if data was modified during their read.
+39. **What is a "Memory Barrier"?** *Answer:* An instruction that forces the CPU/Compiler to maintain a specific order of memory operations to prevent race conditions.
+40. **How does the kernel handle "Spurious Interrupts"?** *Answer:* By checking hardware status registers within the ISR to verify if the device actually requested attention.
+
+---
+
+## 5. Device Drivers & Networking
+41. **What is the "Device Model" (kobject, kset)?** *Answer:* A framework used to track all devices in the system, their hierarchy, and their relationship to drivers.
+42. **Explain "Character Devices" vs "Block Devices".** *Answer:* Char devices are accessed as a stream of bytes (keyboard); Block devices are accessed in fixed-size chunks and support seeking (SSD).
+43. **How does DMA (Direct Memory Access) work?** *Answer:* Hardware transfers data directly to/from RAM without CPU intervention, notifying the CPU via interrupt when finished.
+44. **What is the "NAPI" (New API) in networking?** *Answer:* A technique that switches from interrupt-driven to polling-driven packet processing under high load to prevent "interrupt storms."
+45. **Explain the "sk_buff" (Socket Buffer) structure.** *Answer:* The core data structure for network packets, designed to avoid copying data as it moves through the protocol stack.
+46. **What is "Zero-Copy" networking?** *Answer:* Using `sendfile()` or `splice()` to move data from disk to network card without copying it into user-space memory.
+47. **Describe "Netfilter" and its role.** *Answer:* A framework that provides hooks at various points in the networking stack for packet filtering (iptables), NAT, and mangling.
+48. **What is a "Loadable Kernel Module" (LKM)?** *Answer:* Code that can be added to or removed from the kernel at runtime without rebooting, typically used for drivers.
+49. **How does the kernel handle "Hotplugging" (e.g., USB)?** *Answer:* The kernel detects the hardware change, notifies `udev` in user-space, which then loads the appropriate module.
+50. **What is the purpose of `/proc` and `/sys`?** *Answer:* Pseudo-filesystems that provide an interface to kernel internals (`/proc` for processes/system info, `/sys` for device/driver hierarchy).
+
+---
+
+[Linux System Design and Architecture](https://www.youtube.com/watch?v=MxfLlmSofNc)
+
+This video provides a solid overview of Linux system design and the core components of the kernel, which is essential for understanding the high-level architecture expected at a senior level.
 
