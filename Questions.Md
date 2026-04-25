@@ -135,7 +135,202 @@ Below is a high-coverage OS interview question bank for NVIDIA-style roles (syst
 5. Design a userspace service that minimizes syscall overhead.
 6. Design a logging pipeline that avoids blocking hot path.
 
-If you want, I can give you:
-1. A 7-day preparation plan for these OS topics.
-2. Top 30 most likely NVIDIA OS questions with model answers.
-3. A mock interview (I ask, you answer, I evaluate).
+Here’s a **high-quality, NVIDIA-style OS interview question bank**—not fluff, but the kind of depth they actually probe for (especially for systems, CUDA, driver, or low-level roles).
+
+---
+
+# 🧠 Core OS Fundamentals (Very Important)
+
+These are almost guaranteed.
+
+### Process vs Thread
+
+* Difference between process and thread?
+* When would you prefer threads over processes?
+* What is context switching? Cost?
+* User threads vs kernel threads?
+* What is a zombie process? Orphan process?
+
+---
+
+### Scheduling
+
+* What are scheduling algorithms? Compare:
+
+  * FCFS, SJF, Round Robin, Priority
+* What is starvation? Aging?
+* What is preemption?
+* Real-time scheduling vs general-purpose?
+
+---
+
+### Synchronization & Concurrency 🔥 (NVIDIA LOVES THIS)
+
+* What is a race condition?
+* Mutex vs semaphore?
+* Binary semaphore vs counting semaphore?
+* What is a spinlock?
+* What is deadlock?
+
+Deadlock deep dive:
+
+* 4 necessary conditions
+* Prevention vs avoidance vs detection
+* Banker’s algorithm (sometimes asked)
+
+Advanced:
+
+* Lock-free vs wait-free programming
+* Memory ordering / memory model (very important for GPU + CPU)
+
+---
+
+### Memory Management (CRITICAL)
+
+* What is virtual memory?
+* Paging vs segmentation
+* What is fragmentation? Internal vs external
+* What is TLB?
+* Page replacement algorithms:
+
+  * LRU, FIFO, Optimal
+
+Advanced NVIDIA-style:
+
+* What is NUMA?
+* What is cache coherence?
+* What is false sharing?
+
+---
+
+### System Calls & Kernel
+
+* What is a system call?
+* User mode vs kernel mode
+* What happens when you call `malloc()` internally?
+* What happens during a context switch?
+
+---
+
+### File Systems
+
+* How does a file system work?
+* What is inode?
+* What is journaling?
+
+---
+
+# ⚡ Advanced OS (NVIDIA FOCUS AREA)
+
+These differentiate candidates.
+
+---
+
+### Multithreading & Parallelism
+
+* What is thread affinity?
+* What is work stealing?
+* What is lock contention?
+
+---
+
+### CPU + GPU Interaction (VERY NVIDIA-SPECIFIC)
+
+* How does CPU communicate with GPU?
+* What is DMA?
+* What is pinned memory?
+* What is unified memory (CUDA)?
+
+---
+
+### Memory Hierarchy
+
+* What is cache coherence protocol?
+* MESI protocol basics
+* What is cache line?
+* What is false sharing?
+
+---
+
+### Performance & Optimization
+
+* What is latency vs throughput?
+* What causes cache misses?
+* How to optimize memory access?
+
+---
+
+### OS + Hardware Interface
+
+* Interrupt vs polling?
+* What is an interrupt handler?
+* What is a device driver?
+
+---
+
+# 🔥 Coding + Design Questions (Common in NVIDIA)
+
+### Implementations
+
+* Design your own malloc (you just asked this 👍)
+* Implement a thread-safe queue
+* Producer-consumer problem
+* Reader-writer lock
+
+---
+
+### Design Questions
+
+* Design a memory allocator
+* Design a scheduler
+* Design a logging system (multi-threaded)
+* Design a high-performance cache
+
+---
+
+# 🧩 Trick / Deep Thinking Questions
+
+These test real understanding.
+
+* Why is `volatile` not enough for synchronization?
+* Why are locks expensive?
+* What happens if you disable interrupts?
+* Can deadlock occur with one thread?
+* Why is malloc not constant time?
+
+---
+
+# 🧪 Debugging / Scenario Questions
+
+Very common in NVIDIA interviews.
+
+* Program runs slower on multi-core — why?
+* Threads not scaling — what could be wrong?
+* Memory leak detection?
+* High CPU usage debugging?
+
+---
+
+# 🎯 Must-Know Topics for NVIDIA (Priority Order)
+
+1. Concurrency + Synchronization 🔥🔥🔥
+2. Memory Management 🔥🔥🔥
+3. CPU–GPU Interaction 🔥🔥
+4. Cache & Performance 🔥🔥
+5. Scheduling 🔥
+6. File Systems (light)
+
+---
+
+# 💡 How NVIDIA Differs from Typical Companies
+
+They focus less on definitions and more on:
+
+* **Performance**
+* **Parallelism**
+* **Hardware-aware thinking**
+* **Real-world debugging**
+
+---
+
+
