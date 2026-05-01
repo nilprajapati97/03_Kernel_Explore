@@ -35,9 +35,9 @@ rcu_read_unlock();      /* Marks end — defers reclamation of old objects */
 
 ```mermaid
 sequenceDiagram
-    participant Reader1 as Reader 1 (old)
-    participant Reader2 as Reader 2 (new)
-    participant Writer as Writer
+    participant Reader1 as "Reader 1 (old)"
+    participant Reader2 as "Reader 2 (new)"
+    participant Writer as "Writer"
     participant Old as Old Object
     participant New as New Object
 
@@ -94,12 +94,12 @@ int get_max_size(void)
 {
     int size;
     struct config *cfg;
-    
+
     rcu_read_lock();
     cfg = rcu_dereference(current_config);
     size = cfg ? cfg->max_size : -1;
     rcu_read_unlock();
-    
+
     return size;
 }
 
@@ -108,22 +108,22 @@ int update_config(int new_max, const char *new_name)
 {
     struct config *old_cfg;
     struct config *new_cfg;
-    
+
     /* 1. Allocate and initialize new config */
     new_cfg = kmalloc(sizeof(*new_cfg), GFP_KERNEL);
     if (!new_cfg)
         return -ENOMEM;
     new_cfg->max_size = new_max;
     strncpy(new_cfg->name, new_name, sizeof(new_cfg->name) - 1);
-    
+
     /* 2. Install new config (atomic) */
     old_cfg = rcu_dereference_protected(current_config, 1);
     rcu_assign_pointer(current_config, new_cfg);
-    
+
     /* 3. Free old config after grace period */
     if (old_cfg)
         kfree_rcu(old_cfg, rcu);  /* kfree_rcu = call_rcu + kfree */
-    
+
     return 0;
 }
 ```
@@ -163,12 +163,12 @@ flowchart LR
     GP["Grace Period Start\n(rcu_assign_pointer)"] --> QS["Quiescent States on all CPUs"]
     QS --> GE["Grace Period End\n(all readers gone)"]
     GE --> Free["Old object freed\n(kfree / callback)"]
-    
     QS --> Q1["CPU context switch"]
     QS --> Q2["CPU enters idle"]
     QS --> Q3["CPU executes user space"]
     Q1 & Q2 & Q3 --> AllCPUs["All CPUs observed\n≥1 quiescent state"]
     AllCPUs --> GE
+```
 ```
 
 ---

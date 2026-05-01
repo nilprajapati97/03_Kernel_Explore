@@ -42,14 +42,14 @@ The easiest way to use work queues is via the **system-wide** work queue `system
 static void my_work_fn(struct work_struct *work)
 {
     struct my_device *dev = container_of(work, struct my_device, work);
-    
+
     /* CAN sleep here! */
     if (mutex_lock_interruptible(&dev->lock))
         return;
-    
+
     msleep(10);  /* OK! */
     process_data(dev);
-    
+
     mutex_unlock(&dev->lock);
 }
 
@@ -114,20 +114,20 @@ destroy_workqueue(my_wq);  /* Flushes all pending work first */
 
 ```mermaid
 sequenceDiagram
-    participant IRQ as ISR (hard IRQ)
-    participant WQ as Workqueue
-    participant Worker as kworker thread
-    participant Handler as my_work_fn()
+    participant IRQ as "ISR (hard IRQ)"
+    participant WQ as "Workqueue"
+    participant Worker as "kworker thread"
+    participant Handler as "my_work_fn()"
 
     IRQ->>IRQ: Hardware interrupt
     IRQ->>WQ: schedule_work(&dev->work)
     Note over WQ: Work added to per-CPU queue
     IRQ->>IRQ: Return from ISR (fast)
-    
     Worker->>WQ: Poll for work
     WQ->>Worker: Give work item
     Worker->>Handler: my_work_fn(&dev->work)
     Note over Handler: Can sleep, lock mutexes, alloc memory
+```
     Handler->>Handler: Process data
     Handler->>Worker: Return
     Worker->>WQ: Poll again
@@ -156,16 +156,16 @@ static void thermal_poll_fn(struct work_struct *work)
                                               struct thermal_monitor,
                                               poll_work);
     int temperature;
-    
+
     /* This can sleep — thermal_zone_get_temp may block */
     thermal_zone_get_temp(tm->tz, &temperature);
-    
+
     if (temperature > tm->threshold_temp) {
         pr_warn("Temperature %d°C exceeds threshold %d°C!\n",
                 temperature / 1000, tm->threshold_temp / 1000);
         /* Could send notification, throttle CPU, etc. */
     }
-    
+
     /* Reschedule itself every 1 second */
     queue_delayed_work(tm->wq, &tm->poll_work, HZ);
 }
@@ -175,9 +175,9 @@ static int thermal_monitor_init(struct thermal_monitor *tm)
     tm->wq = alloc_workqueue("thermal_monitor", WQ_MEM_RECLAIM, 1);
     if (!tm->wq)
         return -ENOMEM;
-    
+
     INIT_DELAYED_WORK(&tm->poll_work, thermal_poll_fn);
-    
+
     /* Start polling after 1 second */
     queue_delayed_work(tm->wq, &tm->poll_work, HZ);
     return 0;

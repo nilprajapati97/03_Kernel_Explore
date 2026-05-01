@@ -4,18 +4,18 @@
 
 ```mermaid
 flowchart TD
-    A[Need to defer work from ISR?] --> B{Can the work sleep?}
-    B -- "Yes (needs mutex, kmalloc/GFP_KERNEL, msleep)" --> C[Use Work Queue]
-    B -- "No (interrupt context constraints)" --> D{Is this a\nnew driver?}
-    D -- "Yes (new code)" --> E[Use Threaded IRQ\nrequest_threaded_irq]
-    D -- "No/Performance critical" --> F{Need concurrent\nexecution?}
-    F -- "Yes (same handler on multiple CPUs)" --> G[Use Softirq\n(if in-tree core code)]
-    F -- "No (serialized per-handler)" --> H[Use Tasklet\n(legacy) or Threaded IRQ]
-    
-    C --> I[schedule_work / INIT_WORK]
-    E --> J[request_threaded_irq with thread_fn]
-    G --> K[open_softirq / raise_softirq]
-    H --> L[tasklet_setup / tasklet_schedule]
+    A["Need to defer work from ISR?"] --> B{"Can the work sleep?"}
+    B -- "Yes (needs mutex, kmalloc/GFP_KERNEL, msleep)" --> C["Use Work Queue"]
+    B -- "No (interrupt context constraints)" --> D{"Is this a new driver?"}
+    D -- "Yes (new code)" --> E["Use Threaded IRQ\nrequest_threaded_irq"]
+    D -- "No/Performance critical" --> F{"Need concurrent execution?"}
+    F -- "Yes (same handler on multiple CPUs)" --> G["Use Softirq\n(if in-tree core code)"]
+    F -- "No (serialized per-handler)" --> H["Use Tasklet\n(legacy) or Threaded IRQ"]
+    C --> I["schedule_work / INIT_WORK"]
+    E --> J["request_threaded_irq with thread_fn"]
+    G --> K["open_softirq / raise_softirq"]
+    H --> L["tasklet_setup / tasklet_schedule"]
+```
 ```
 
 ---
@@ -75,17 +75,17 @@ ret = request_threaded_irq(
 ## 5. Latency vs Flexibility Trade-off
 
 ```mermaid
-graph LR
+flowchart LR
     A["Hard IRQ\n(Fastest)"] --> B["Softirq\n(Fast)"]
     B --> C["Tasklet\n(Fast, serialized)"]
     C --> D["Work Queue\n(Slower, flexible)"]
     D --> E["User Process\n(Slowest, fully flexible)"]
-    
     style A fill:#ff4444,color:#fff
     style B fill:#ff8800,color:#fff
     style C fill:#ffcc00
     style D fill:#44ff44
     style E fill:#4488ff,color:#fff
+```
 ```
 
 ---

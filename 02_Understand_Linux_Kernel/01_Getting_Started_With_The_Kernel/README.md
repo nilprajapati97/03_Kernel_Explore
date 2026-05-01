@@ -1,6 +1,6 @@
 # Chapter 01 — Getting Started with the Linux Kernel
 
-> **Book:** Linux Kernel Development — Robert Love (3rd Edition)  
+> **Book:** Linux Kernel Development — Robert Love (3rd Edition)
 > **Goal:** Set up the development environment, understand the kernel source tree, build the kernel from scratch, and understand how to contribute.
 
 ---
@@ -37,4 +37,15 @@ flowchart TD
     F --> G[Update bootloader\nGRUB rebuild]
     G --> H[Boot new kernel]
     H --> I[Develop → Patch → Submit to LKML]
+```mermaid
+flowchart TD
+    Kernel["Linux Kernel Source Tree"] --> Arch["arch/"]
+    Kernel --> Drivers["drivers/"]
+    Kernel --> Fs["fs/"]
+    Kernel --> Include["include/"]
+    Kernel --> KernelDir["kernel/"]
+    Kernel --> Lib["lib/"]
+    Kernel --> Mm["mm/"]
+    Kernel --> Tools["tools/"]
+    Kernel --> Documentation["Documentation/"]
 ```

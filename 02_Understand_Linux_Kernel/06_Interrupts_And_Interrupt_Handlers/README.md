@@ -13,6 +13,7 @@ flowchart LR
     Handler -->|"fast path: acknowledge"| Return["Resume execution"]
     Handler -->|"slow work"| BH["Bottom Half\n(softirq/tasklet/workqueue)"]
 ```
+```
 
 ## Topics
 

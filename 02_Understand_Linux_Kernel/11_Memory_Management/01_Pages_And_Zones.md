@@ -31,7 +31,7 @@ struct page {
 Physical memory is divided into **zones** based on hardware constraints:
 
 ```mermaid
-graph TD
+flowchart TD
     subgraph "Physical Address Space (x86-64)"
         Z1["ZONE_DMA\n0–16 MiB\nLegacy ISA DMA devices"]
         Z2["ZONE_DMA32\n16 MiB–4 GiB\n32-bit PCI DMA"]
@@ -40,6 +40,7 @@ graph TD
         Z5["ZONE_MOVABLE\nMigratable pages\nMemory hotplug"]
         Z1 --> Z2 --> Z3 --> Z4 --> Z5
     end
+```
 ```
 
 ```c
@@ -75,7 +76,7 @@ struct zone {
 On NUMA (Non-Uniform Memory Access) machines, memory is split into **nodes**:
 
 ```mermaid
-graph LR
+flowchart LR
     subgraph "Node 0 (CPU 0-3)"
         RAM0["Local RAM\n32 GiB\nFast access"]
     end
@@ -86,6 +87,7 @@ graph LR
     CPU4["CPU 4-7"] -->|"fast"| RAM1
     CPU0 -->|"slow (QPI/HyperTransport)"| RAM1
     CPU4 -->|"slow"| RAM0
+```
 ```
 
 ```c

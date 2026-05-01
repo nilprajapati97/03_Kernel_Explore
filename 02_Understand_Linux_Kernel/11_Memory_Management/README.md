@@ -5,7 +5,7 @@
 Memory management is one of the most complex kernel subsystems. It handles physical memory allocation, virtual memory mapping, page reclaim, and the slab allocator.
 
 ```mermaid
-graph TD
+flowchart TD
     PM["Physical Memory\n(RAM, pages)"] --> PA["Page Allocator\n(Buddy system)"]
     PA --> SLAB["Slab/SLUB Allocator\n(Object caches)"]
     PA --> VMALLOC["vmalloc()\n(virtually contiguous)"]

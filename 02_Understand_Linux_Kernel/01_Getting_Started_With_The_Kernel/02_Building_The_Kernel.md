@@ -114,12 +114,13 @@ uname -r         # Verify new kernel is running
 ## 5. Build Artifacts
 
 ```mermaid
-flowchart LR
-    Make[make] --> vmlinux[vmlinux\nFull ELF kernel\nunstripped]
-    Make --> bzImage[arch/x86/boot/bzImage\n'big zImage'\ncompressed, bootable]
-    Make --> SystemMap[System.map\nkernel symbol table]
-    Make --> DotConfig2[.config\nconfiguration snapshot]
-    Make --> Modules[drivers/**/*.ko\nLoadable modules]
+flowchart TD
+    Src["Kernel Source"] --> Config["make menuconfig"]
+    Config --> Build["make -jN"]
+    Build --> Modules["make modules_install"]
+    Build --> Kernel["make install"]
+    Kernel --> Boot["Reboot"]
+```
 ```
 
 | File | Location | Purpose |

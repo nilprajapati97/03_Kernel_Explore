@@ -55,9 +55,9 @@ vfree(p);
 ```
 
 ```mermaid
-graph LR
+flowchart LR
     subgraph "Physical Memory"
-        P0["Page A"] 
+        P0["Page A"]
         P1["Page B (not adjacent)"]
         P2["Page C (far away)"]
     end
@@ -67,6 +67,7 @@ graph LR
     P0 --> V
     P1 --> V
     P2 --> V
+```
 ```
 
 - vmalloc pages are **individually mapped** into the kernel page table
@@ -79,14 +80,15 @@ graph LR
 
 ```mermaid
 flowchart TD
-    A[Need memory?] --> B{Size < 128KiB?}
-    B -- Yes --> C{DMA needed?}
-    B -- No --> D[Consider vmalloc]
-    C -- Yes --> E[kmalloc + GFP_DMA]
-    C -- No --> F[kmalloc GFP_KERNEL]
-    D --> G{Physical contiguity needed?}
-    G -- Yes --> H[Warn: may fail for large allocs]
-    G -- No --> I[vmalloc]
+    A["Need memory?"] --> B{"Size < 128KiB?"}
+    B -- Yes --> C{"DMA needed?"}
+    B -- No --> D["Consider vmalloc"]
+    C -- Yes --> E["kmalloc + GFP_DMA"]
+    C -- No --> F["kmalloc GFP_KERNEL"]
+    D --> G{"Physical contiguity needed?"}
+    G -- Yes --> H["Warn: may fail for large allocs"]
+    G -- No --> I["vmalloc"]
+```
 ```
 
 ---

@@ -25,6 +25,7 @@ flowchart TD
     Cache --> Slabs["Slabs — groups of pages\nfrom buddy allocator"]
     Slabs --> Objects["Fixed-size objects\n(pre-initialized)"]
 ```
+```
 
 ---
 
@@ -81,8 +82,8 @@ stateDiagram-v2
     Partial --> Full: All objects allocated
     Partial --> Empty: All objects freed
     Empty --> [*]: Slab returned to buddy allocator
-    
     note right of Partial: Most allocations served\nfrom partial slabs
+```
 ```
 
 ---

@@ -157,12 +157,13 @@ drivers/
 
 ```mermaid
 flowchart TD
-    Start[New to kernel codebase?] --> M[MAINTAINERS\nFind who owns the code]
-    Start --> KC[Kconfig\nConfiguration options]
-    Start --> MF[Makefile\nBuild rules per directory]
-    KC --> Config[.config\nYour build configuration]
-    Start --> DTX[Documentation/\nOfficial docs]
-    Start --> CS[Documentation/process/coding-style.rst\nKernel coding standard]
+    Start["New to kernel codebase?"] --> M["MAINTAINERS\nFind who owns the code"]
+    Start --> KC["Kconfig\nConfiguration options"]
+    Start --> MF["Makefile\nBuild rules per directory"]
+    KC --> Config[".config\nYour build configuration"]
+    Start --> DTX["Documentation/\nOfficial docs"]
+    Start --> CS["Documentation/process/coding-style.rst\nKernel coding standard"]
+```
 ```
 
 ### `MAINTAINERS` File

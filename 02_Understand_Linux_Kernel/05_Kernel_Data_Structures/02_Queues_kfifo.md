@@ -14,20 +14,19 @@
 ## 2. Circular Buffer Mechanics
 
 ```mermaid
-graph LR
+flowchart LR
     subgraph "kfifo (size=8)"
         direction LR
         B0["[0]"] --> B1["[1]"] --> B2["[2]"] --> B3["[3]"]
         B3 --> B4["[4]"] --> B5["[5]"] --> B6["[6]"] --> B7["[7]"]
-        B7 -->|wrap| B0
+        B7 -->|"wrap"| B0
     end
-    
     IN["in = 3 (write pos)"] -.-> B3
     OUT["out = 1 (read pos)"] -.-> B1
-    
     style B1 fill:#ffe0e0
     style B2 fill:#ffe0e0
     style B3 fill:#ffe0e0
+```
 ```
 
 - `in` = write index (producer advances)
@@ -125,7 +124,7 @@ sequenceDiagram
     Consumer->>FIFO: kfifo_get(&event_fifo, &ev)
     Note over FIFO: out++ (atomic on single-CPU)
     Consumer->>Consumer: Process event
-    
+
     Note over Producer,Consumer: No lock needed for SPSC!
 ```
 
@@ -151,11 +150,11 @@ static DEFINE_SPINLOCK(log_lock);   /* Only needed for multi-producer */
 static void log_event_irq(int type, const char *msg)
 {
     struct log_event ev;
-    
+
     ev.timestamp = jiffies;
     ev.type = type;
     strncpy(ev.msg, msg, sizeof(ev.msg) - 1);
-    
+
     /* kfifo_in_spinlocked for multi-producer safety */
     kfifo_in_spinlocked(&event_log, &ev, 1, &log_lock);
 }
@@ -164,7 +163,7 @@ static void log_event_irq(int type, const char *msg)
 static void drain_events(void)
 {
     struct log_event ev;
-    
+
     while (kfifo_get(&event_log, &ev)) {
         printk(KERN_INFO "[%lu] type=%d: %s\n",
                ev.timestamp, ev.type, ev.msg);

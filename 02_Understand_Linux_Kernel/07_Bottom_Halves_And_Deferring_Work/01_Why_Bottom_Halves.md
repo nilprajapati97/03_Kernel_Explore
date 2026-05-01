@@ -21,18 +21,16 @@ But many tasks triggered by hardware events take time:
 ## 2. Top Half vs Bottom Half
 
 ```mermaid
-graph TD
+flowchart TD
     HW["Hardware Event\n(packet arrives)"] --> TOP
-
     subgraph "Top Half (ISR — Hard IRQ context)"
         TOP["1. Acknowledge hardware\n2. Copy data from DMA buffer\n3. Schedule bottom half\n4. Return IMMEDIATELY"]
     end
-    
     subgraph "Bottom Half (deferred, less restricted)"
         BH["5. Process all headers\n6. Route packet\n7. Copy to socket buffer\n8. Wake waiting process"]
     end
-    
-    TOP -->|"schedule_work() or\ntasklet_schedule()"| BH
+    TOP -->|"schedule_work() or tasklet_schedule()"| BH
+```
 ```
 
 ---
@@ -44,32 +42,32 @@ graph TD
 static irqreturn_t e1000_intr(int irq, void *data)
 {
     struct e1000_adapter *adapter = data;
-    
+
     /* Disable IRQ to prevent re-entry */
     e1000_irq_disable(adapter);
-    
+
     /* Schedule NAPI poll — bottom half */
     napi_schedule(&adapter->napi);
-    
+
     return IRQ_HANDLED;  /* Return immediately */
 }
 
 /* Bottom Half — NAPI poll function (called from softirq) */
 static int e1000_clean(struct napi_struct *napi, int budget)
 {
-    struct e1000_adapter *adapter = 
+    struct e1000_adapter *adapter =
         container_of(napi, struct e1000_adapter, napi);
     int work_done = 0;
-    
+
     /* Now do the real work: */
     e1000_clean_rx_irq(adapter, &work_done, budget);  /* Process packets */
     e1000_clean_tx_irq(adapter);                       /* Clean TX ring */
-    
+
     if (work_done < budget) {
         napi_complete_done(napi, work_done);
         e1000_irq_enable(adapter);  /* Re-enable interrupts */
     }
-    
+
     return work_done;
 }
 ```
@@ -79,19 +77,21 @@ static int e1000_clean(struct napi_struct *napi, int budget)
 ## 4. Historical Context
 
 ```mermaid
-timeline
+gantt
     title Linux Bottom Half Evolution
+    dateFormat  YYYY-MM-DD
     section Pre-2.4
-        BH (original) : Global lock, serialized, slow
+    BH_Original :done, 2000-01-01, 1d
     section 2.4
-        Tasklets : Parallel, per-tasklet serialized
-        Softirqs : High-performance, parallel
+    Tasklets :done, 2001-01-01, 1d
+    Softirqs :done, 2001-01-02, 1d
     section 2.6+
-        Work Queues : Process context, can sleep
-        Threaded IRQs : request_threaded_irq()
+    Work_Queues :done, 2003-01-01, 1d
+    Threaded_IRQs :done, 2003-01-02, 1d
     section Modern
-        NAPI : Network interrupt mitigation
-        io_uring : High-performance async I/O
+    NAPI :done, 2005-01-01, 1d
+    io_uring :done, 2019-01-01, 1d
+```
 ```
 
 ---

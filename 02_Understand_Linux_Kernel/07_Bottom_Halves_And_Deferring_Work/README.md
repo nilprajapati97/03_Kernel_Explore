@@ -8,7 +8,7 @@ Interrupt handlers (top halves) must be fast. Work that is too slow for an ISR i
 flowchart TD
     IRQ["Hardware IRQ fires"] --> TOP["Top Half (ISR)\n• Acknowledge HW\n• Read status\n• Schedule bottom half\n• Return quickly"]
     TOP --> BH["Bottom Half\n(runs later, less restricted)"]
-    
+
     BH --> S1["Softirq\n• Lowest overhead\n• Runs in soft IRQ context\n• Cannot sleep\n• Per-CPU, can run in parallel"]
     BH --> S2["Tasklet\n• Built on softirq\n• Serialized per-tasklet\n• Cannot sleep\n• Easier to use than softirq"]
     BH --> S3["Work Queues\n• Kernel threads\n• CAN sleep\n• Highest overhead\n• Most flexible"]

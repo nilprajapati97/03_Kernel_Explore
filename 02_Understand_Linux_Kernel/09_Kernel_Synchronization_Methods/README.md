@@ -5,7 +5,7 @@
 This chapter covers every synchronization primitive available in the Linux kernel, from the simplest atomic operations to the sophisticated RCU mechanism.
 
 ```mermaid
-graph TD
+flowchart TD
     sync["Synchronization Methods"] --> atomic["Atomic Operations\natomic_t, atomic64_t"]
     sync --> spin["Spin Locks\nspin_lock, rwlock"]
     sync --> sem["Semaphores\nup/down"]

@@ -118,16 +118,17 @@ endmenu
 
 ```mermaid
 flowchart TD
-    Launch[make menuconfig] --> Root[Root menu]
-    Root --> GeneralSetup[General Setup]
-    Root --> Processor[Processor type and features]
-    Root --> MemMgmt[Memory Management options]
-    Root --> Networking[Networking support]
-    Root --> Drivers[Device Drivers]
-    Root --> FS[File systems]
-    Drivers --> NetD[Network device support]
-    NetD --> Intel[Intel devices]
-    Intel --> E1000[E1000 driver: y/m/n]
+    Launch["make menuconfig"] --> Root["Root menu"]
+    Root --> GeneralSetup["General Setup"]
+    Root --> Processor["Processor type and features"]
+    Root --> MemMgmt["Memory Management options"]
+    Root --> Networking["Networking support"]
+    Root --> Drivers["Device Drivers"]
+    Root --> FS["File systems"]
+    Drivers --> NetD["Network device support"]
+    NetD --> Intel["Intel devices"]
+    Intel --> E1000["E1000 driver: y/m/n"]
+```
 ```
 
 ### Navigation Keys in menuconfig

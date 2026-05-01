@@ -94,18 +94,18 @@ READ_ONCE(ptr);            /* Atomic single-width load */
 
 ```mermaid
 sequenceDiagram
-    participant P as Producer (CPU 0)
-    participant C as Consumer (CPU 1)
-    participant Mem as Memory
+    participant P as "Producer (CPU 0)"
+    participant C as "Consumer (CPU 1)"
+    participant Mem as "Memory"
 
     P->>Mem: data = 42 (normal store)
     P->>Mem: smp_store_release(&ready, 1)
     Note over P,Mem: Release barrier: data write BEFORE ready write
-
     C->>Mem: r = smp_load_acquire(&ready)
     Note over C,Mem: Acquire barrier: ready read BEFORE data read
     C->>Mem: val = data
     Note over C: Guaranteed: val == 42
+```
 ```
 
 ---

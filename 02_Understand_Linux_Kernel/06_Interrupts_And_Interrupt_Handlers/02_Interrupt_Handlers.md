@@ -92,9 +92,9 @@ ret = request_threaded_irq(
 
 ```mermaid
 sequenceDiagram
-    participant HW as Hardware
-    participant Primary as primary_handler (hard IRQ)
-    participant Thread as thread_handler (kthread)
+    participant HW as "Hardware"
+    participant Primary as "primary_handler (hard IRQ)"
+    participant Thread as "thread_handler (kthread)"
 
     HW->>Primary: Hardware interrupt fires
     Primary->>Primary: Acknowledge HW
@@ -104,6 +104,7 @@ sequenceDiagram
     Thread->>Thread: Process data (can sleep here!)
     Thread->>Thread: Return IRQ_HANDLED
 ```
+```
 
 ---
 
@@ -111,15 +112,16 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    IRQ[IRQ fires on CPU] --> DEVIRQ[do_IRQ / generic_handle_irq]
-    DEVIRQ --> CHIPIRQ[irq_chip: mask/ack IRQ line]
-    CHIPIRQ --> HANDLE[handle_irq_event_percpu]
-    HANDLE --> YOUR[your irq_handler called]
-    YOUR --> A{IRQ_HANDLED?}
-    A -- Yes --> EOI[send EOI, unmask IRQ]
-    A -- No --> CHAIN[try next handler in shared list]
-    EOI --> RETURN[return to interrupted code]
+    IRQ["IRQ fires on CPU"] --> DEVIRQ["do_IRQ / generic_handle_irq"]
+    DEVIRQ --> CHIPIRQ["irq_chip: mask/ack IRQ line"]
+    CHIPIRQ --> HANDLE["handle_irq_event_percpu"]
+    HANDLE --> YOUR["your irq_handler called"]
+    YOUR --> A{"IRQ_HANDLED?"}
+    A -- Yes --> EOI["send EOI, unmask IRQ"]
+    A -- No --> CHAIN["try next handler in shared list"]
+    EOI --> RETURN["return to interrupted code"]
     CHAIN --> HANDLE
+```
 ```
 
 ---
@@ -136,14 +138,14 @@ static irqreturn_t my_handler(int irq, void *dev)
     wake_up(&my_waitqueue);            /* Wake sleeping process */
     printk(KERN_DEBUG "...");          /* Printk (non-sleeping) */
     readl(dev_base + STATUS_REG);      /* MMIO access */
-    
+
     /* NOT ALLOWED: */
     // msleep(1);                      /* Any sleep function */
     // kmalloc(size, GFP_KERNEL);      /* May sleep (use GFP_ATOMIC) */
     // mutex_lock(&mx);                /* May sleep */
     // copy_to_user(ptr, data, len);   /* May fault/sleep */
     // schedule();                     /* NEVER */
-    
+
     return IRQ_HANDLED;
 }
 ```

@@ -65,13 +65,14 @@ struct kobj_type {
 ## 5. kobject Hierarchy = /sys Tree
 
 ```mermaid
-graph TD
+flowchart TD
     Root["/sys"] --> Devices["/sys/devices"]
     Devices --> Platform["/sys/devices/platform"]
     Platform --> Dev1["/sys/devices/platform/serial8250"]
     Dev1 --> Attr1["power/"]
     Dev1 --> Attr2["driver → symlink"]
     Dev1 --> Attr3["uevent"]
+```
 ```
 
 ---

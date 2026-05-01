@@ -11,29 +11,28 @@ The Linux kernel is developed by thousands of contributors worldwide using **ema
 ```mermaid
 flowchart TD
     subgraph Top["Top Level"]
-        Linus[Linus Torvalds\nFinal authority\nlinux.git]
+        Linus["Linus Torvalds\nFinal authority\nlinux.git"]
     end
     subgraph Subsystems["Subsystem Maintainers"]
-        Net[David Miller\nNet maintainer]
-        MM[Andrew Morton\nMM maintainer]
-        FS[Al Viro\nVFS maintainer]
-        Sched[Ingo Molnar\nSched maintainer]
-        Stable[Greg KH\nStable releases]
+        Net["David Miller\nNet maintainer"]
+        MM["Andrew Morton\nMM maintainer"]
+        FS["Al Viro\nVFS maintainer"]
+        Sched["Ingo Molnar\nSched maintainer"]
+        Stable["Greg KH\nStable releases"]
     end
     subgraph Drivers["Driver/Sub-subsystem Maintainers"]
-        USB[USB maintainer]
-        GPU[DRM/GPU maintainer]
-        I2C[I2C maintainer]
+        USB["USB maintainer"]
+        GPU["DRM/GPU maintainer"]
+        I2C["I2C maintainer"]
     end
     subgraph Devs["Developers (thousands)"]
-        D1[Developer A] 
-        D2[Developer B]
-        D3[You!]
+        D1["Developer A"]
+        D2["Developer B"]
+        D3["You!"]
     end
-
-    D1 & D2 & D3 --> |Email patches| Subsystems
-    Subsystems --> |Pull requests| Linus
-    Stable --> |Backport fixes| Linus
+    D1 & D2 & D3 -->|"Email patches"| Subsystems
+    Subsystems -->|"Pull requests"| Linus
+    Stable -->|"Backport fixes"| Linus
     USB & GPU & I2C --> Net & MM & FS & Sched
 ```
 
@@ -58,6 +57,7 @@ sequenceDiagram
     Dev->>Dev: Build test + boot test
     Dev->>LKML: git send-email patch.patch
     LKML->>Bot: Archived at patchwork
+```
     LKML->>Review: Community reviews
     Review->>LKML: Reviewed-by / Acked-by / Comments
     Dev->>LKML: Resend v2/v3 with fixes
@@ -253,11 +253,12 @@ This is legally important and required for all kernel patches.
 
 ```mermaid
 flowchart TD
-    A[Start] --> B[Read coding style doc]
-    B --> C[Subscribe to LKML and a subsystem list]
-    C --> D[Read existing patches on lore.kernel.org]
-    D --> E[Find a simple bug or TODO]
-    E --> F[kernelnewbies.org for starter bugs]
+    A["Start"] --> B["Read coding style doc"]
+    B --> C["Subscribe to LKML and a subsystem list"]
+    C --> D["Read existing patches on lore.kernel.org"]
+    D --> E["Find a simple bug or TODO"]
+    E --> F["kernelnewbies.org for starter bugs"]
+```
     F --> G[Write fix + checkpatch + build test]
     G --> H[Send patch to list]
     H --> I[Address review comments]

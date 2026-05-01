@@ -123,14 +123,15 @@ idr_destroy(&my_idr);
 
 ```mermaid
 flowchart TD
-    A[Need integer-to-pointer map?] --> B{New code?}
-    B -- Yes --> C[Use XArray]
-    B -- No, existing IDR --> D[Keep IDR or migrate]
-    C --> E{Need auto-allocated IDs?}
+    A["Need integer-to-pointer map?"] --> B{"New code?"}
+    B -- Yes --> C["Use XArray"]
+    B -- No, existing IDR --> D["Keep IDR or migrate"]
+    C --> E{"Need auto-allocated IDs?"}
     E -- Yes --> F["xa_init_flags(&xa, XA_FLAGS_ALLOC)\nxa_alloc()"]
     E -- No --> G["xa_init(&xa)\nxa_store(index)"]
-    F --> H[Done]
+    F --> H["Done"]
     G --> H
+```
 ```
 
 ---
@@ -154,10 +155,10 @@ struct files_struct {
 
 ```mermaid
 sequenceDiagram
-    participant App as Application
-    participant Kernel as sys_open()
-    participant FDT as File Descriptor Table (XArray)
-    participant FS as Filesystem
+    participant App as "Application"
+    participant Kernel as "sys_open()"
+    participant FDT as "File Descriptor Table (XArray)"
+    participant FS as "Filesystem"
 
     App->>Kernel: open("/tmp/foo", O_RDWR)
     Kernel->>FS: vfs_open("/tmp/foo")
@@ -165,11 +166,11 @@ sequenceDiagram
     Kernel->>FDT: xa_alloc(&fdt, &fd, filp, ...)
     FDT->>Kernel: fd = 3
     Kernel->>App: return 3
-
     App->>Kernel: read(3, buf, 100)
     Kernel->>FDT: xa_load(&fdt, 3)
     FDT->>Kernel: struct file *filp
     Kernel->>FS: filp->f_op->read()
+```
 ```
 
 ---

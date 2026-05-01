@@ -47,10 +47,10 @@ Linux uses a **ticket spinlock** — like a deli counter — to ensure fairness 
 
 ```mermaid
 sequenceDiagram
-    participant CPU0 as CPU 0
-    participant CPU1 as CPU 1
-    participant CPU2 as CPU 2
-    participant Lock as Lock {head=0, tail=0}
+    participant CPU0 as "CPU 0"
+    participant CPU1 as "CPU 1"
+    participant CPU2 as "CPU 2"
+    participant Lock as "Lock {head=0, tail=0}"
 
     CPU0->>Lock: fetch_and_inc(tail) → gets ticket 0
     Note over Lock: head=0, tail=1. CPU0 holds lock.
@@ -58,6 +58,7 @@ sequenceDiagram
     CPU2->>Lock: fetch_and_inc(tail) → gets ticket 2
     Note over CPU1,CPU2: Spinning: wait until head == my_ticket
     CPU0->>Lock: spin_unlock: head = 1
+```
     Note over CPU1: head==1 == my_ticket! CPU1 acquires lock
     CPU1->>Lock: spin_unlock: head = 2
     Note over CPU2: head==2 == my_ticket! CPU2 acquires lock

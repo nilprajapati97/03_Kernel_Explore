@@ -57,17 +57,17 @@ complete_all(&my_comp);      /* Wake ALL waiters */
 
 ```mermaid
 sequenceDiagram
-    participant Parent as Parent Task
-    participant Child as Child Kthread
-    participant Comp as struct completion
+    participant Parent as "Parent Task"
+    participant Child as "Child Kthread"
+    participant Comp as "struct completion"
 
     Parent->>Comp: init_completion(&started)
-    Parent->>Child: kthread_run(child_fn, &started, "child")
+    Parent->>Child: kthread_run(child_fn, &started, 'child')
     Parent->>Comp: wait_for_completion(&started)
     Note over Parent: Parent sleeps until child signals
-    
     Child->>Child: Initialize hardware
     Child->>Child: Set up data structures
+```
     Child->>Comp: complete(&started)
     Note over Parent: Woken up — child is ready
     Parent->>Parent: Continue (child is ready)
@@ -80,17 +80,17 @@ struct completion started;
 static int child_thread(void *data)
 {
     struct completion *started = data;
-    
+
     /* Do initialization work */
     if (init_hardware() < 0) {
         /* Signal parent even on error — else parent waits forever */
         complete(started);
         return -EIO;
     }
-    
+
     /* Signal parent we're ready */
     complete(started);
-    
+
     /* Now run main loop */
     while (!kthread_should_stop()) {
         do_work();
@@ -102,11 +102,11 @@ static int child_thread(void *data)
 static int start_child(void)
 {
     init_completion(&started);
-    
+
     task = kthread_run(child_thread, &started, "my_child");
     if (IS_ERR(task))
         return PTR_ERR(task);
-    
+
     /* Wait for child to initialize */
     wait_for_completion(&started);
     return 0;
@@ -135,16 +135,16 @@ static void dma_irq_handler(void *data)
 int do_dma_transfer(struct my_dma *dma, void *buf, size_t len)
 {
     reinit_completion(&dma->dma_done);
-    
+
     /* Start DMA */
     start_dma(dma, buf, len);
-    
+
     /* Wait up to 5 seconds */
     if (!wait_for_completion_timeout(&dma->dma_done, 5 * HZ)) {
         dev_err(dev, "DMA timeout!\n");
         return -ETIMEDOUT;
     }
-    
+
     return 0;
 }
 ```

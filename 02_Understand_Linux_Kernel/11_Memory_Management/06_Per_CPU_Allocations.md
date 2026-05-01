@@ -5,13 +5,13 @@
 Per-CPU variables eliminate locking by giving each CPU its **own copy**.
 
 ```mermaid
-graph LR
-    CPU0["CPU 0\ncounter=5"] 
+flowchart LR
+    CPU0["CPU 0\ncounter=5"]
     CPU1["CPU 1\ncounter=12"]
     CPU2["CPU 2\ncounter=3"]
     CPU3["CPU 3\ncounter=8"]
-    
     CPU0 & CPU1 & CPU2 & CPU3 -->|"Sum for total"| Aggregate["Total: 28"]
+```
 ```
 
 - **No cache line bouncing** — CPUs never fight for the same memory
@@ -78,9 +78,9 @@ free_percpu(counter);
 
 ```mermaid
 sequenceDiagram
-    participant P as Process (CPU 2)
-    participant K as Kernel
-    participant M as Memory
+    participant P as "Process (CPU 2)"
+    participant K as "Kernel"
+    participant M as "Memory"
 
     P->>K: get_cpu_var(my_counter)
     K->>K: preempt_disable()
@@ -89,6 +89,7 @@ sequenceDiagram
     P->>P: Modify value
     P->>K: put_cpu_var(my_counter)
     K->>K: preempt_enable()
+```
 ```
 
 ---
